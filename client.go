@@ -57,10 +57,10 @@ func (c *Client) GetAllMarathonApps() MarathonApps {
 }
 
 //AppExists for a Scaler
-func (c *Client) AppExists(r *Scaler) bool {
+func (c *Client) AppExists(scaler *Scaler) bool {
 	var mApps = c.GetAllMarathonApps()
 	for _, mApp := range mApps.Apps {
-		if r.AppID == mApp.ID {
+		if scaler.AppID == mApp.ID {
 			return true
 		}
 	}

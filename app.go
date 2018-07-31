@@ -32,40 +32,41 @@ type scalerState struct {
 }
 
 //StartMonitor starts a ticker goroutine
-func (r *Scaler) StartMonitor() {
-	tickers[r.AppID] = time.NewTicker(time.Second * time.Duration(r.Interval))
-	go r.doMonitor()
+func (scaler *Scaler) StartMonitor() {
+	tickers[scaler.AppID] = time.NewTicker(time.Second * time.Duration(scaler.Interval))
+	go scaler.doMonitor()
 }
 
 //doMonitor will be storing the intermediate state of the app metrics
-func (r *Scaler) doMonitor() {
+func (scaler *Scaler) doMonitor() {
 	as := scalerState{0, 0}
 	var cpu, mem float64
-	for range tickers[r.AppID].C {
-		if !client.AppExists(a) {
-			log.Warningf("%s not found in /service/marathon/v2/app", r.AppID)
+	for range tickers[scaler.AppID].C {
+		if !client.AppExists(r) {
+			log.Warningf("%s not found in /service/marathon/v2/app", scaler.AppID)
 			continue
 		}
-		marathonApp := client.GetMarathonApp(r.AppID)
+		marathonApp := client.GetMarathonApp(scaler.AppID)
 		if marathonApp.App.Instances == 0 {
 			log.Warningf("%s suspended, skipping monitoring cycle", marathonApp.App.ID)
 			continue
 		}
-		if !r.EnsureMinMaxInstances(marathonApp) {
+		if !scaler.EnsureMinMaxInstances(marathonApp) {
 			continue
 		}
-		cpu, mem = r.getCPUMem(marathonApp)
-		log.Infof("app:%s cpu:%f, mem:%f", r.AppID, cpu, mem)
-		r.AutoScale(cpu, mem, &as, marathonApp)
+		cpu, mem = scaler.getCPUMem(marathonApp)
+		log.Infof("app:%s cpu:%f, mem:%f", scaler.AppID, cpu, mem)
+		scaler.AutoScale(cpu, mem, &as, marathonApp)
 	}
 }
 
 //StopMonitor stops the ticker associated with the given app
-func (r *Scaler) StopMonitor() {
-	tickers[r.AppID].Stop()
+func (scaler *Scaler) StopMonitor() {
+	tickers[scaler.AppID].Stop()
 }
 
-func (r *Scaler) getCPUMem(marathonApp MarathonApp) (float64, float64) {
+// TODO this doesn't need to be attached to Scaler, I don't think
+func (scaler *Scaler) getCPUMem(marathonApp MarathonApp) (float64, float64) {
 	var (
 		stats1, stats2               TaskStats
 		cpu, cpu1, cpu2, cpuD, timeD float64

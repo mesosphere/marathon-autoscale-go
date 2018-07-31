@@ -15,17 +15,17 @@ func init() {
 }
 
 //RepoAddApp adds a Scaler to the repo
-func RepoAddApp(r Scaler) {
-	if !RepoAppInApps(r.AppID) {
-		apps = append(scalers, r)
-		r.StartMonitor()
+func RepoAddApp(scaler Scaler) {
+	if !RepoAppInApps(scaler.AppID) {
+		apps = append(scalers, scaler)
+		scaler.StartMonitor()
 	}
 }
 
 //RepoAppInApps finds if an app is present in the apps list
 func RepoAppInApps(appID string) bool {
-	for _, r := range scalers {
-		if r.AppID == appID {
+	for _, scaler := range scalers {
+		if scaler.AppID == appID {
 			return true
 		}
 	}
@@ -34,9 +34,9 @@ func RepoAppInApps(appID string) bool {
 
 //RepoFindApp returns an Scaler object based on app ID
 func RepoFindApp(appID string) Scaler {
-	for _, r := range scalers {
-		if r.AppID == appID {
-			return r
+	for _, scaler := range scalers {
+		if scaler.AppID == appID {
+			return scaler
 		}
 	}
 	return Scaler{}
@@ -44,8 +44,8 @@ func RepoFindApp(appID string) Scaler {
 
 //RepoRemoveApp re-slices the apps list to remove an app by its ID
 func RepoRemoveApp(appID string) error {
-	for i, r := range scalers {
-		if r.AppID == appID {
+	for i, scaler := range scalers {
+		if scaler.AppID == appID {
 			scalers = append(scalers[:i], scalers[i+1:]...)
 			//Stopping the ticker
 			tickers[appID].Stop()
@@ -57,8 +57,8 @@ func RepoRemoveApp(appID string) error {
 
 //RepoRemoveAllApps cycles through the apps array and removes them all
 func RepoRemoveAllApps() error {
-	for _, r := range Scalers {
-		if err := RepoRemoveApp(r.AppID); err != nil {
+	for _, scaler := range Scalers {
+		if err := RepoRemoveApp(scaler.AppID); err != nil {
 			return err
 		}
 	}
