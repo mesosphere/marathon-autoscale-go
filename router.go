@@ -25,30 +25,6 @@ var routes = []Route {
 	Route {
 		"ListScalers",
 		"GET",
-		"/apps",
-		ListScalers,
-	},
-	Route {
-		"GetScaler",
-		"GET",
-		"/app",
-		GetScaler,
-	},
-	Route {
-		"AddScaler",
-		"POST",
-		"/apps",
-		AddScaler,
-	},
-	Route {
-		"RemoveScaler",
-		"DELETE",
-		"/apps",
-		RemoveScaler,
-	},
-	Route {
-		"ListScalers",
-		"GET",
 		"/scalers",
 		ListScalers,
 	},
