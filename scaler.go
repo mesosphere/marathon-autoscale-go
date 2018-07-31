@@ -130,13 +130,13 @@ func (scaler *Scaler) autoscaleCpuMem(cpu, mem float64) (int) {
 // TODO actually output value of direction
 func getDirection(label string, value float64, min float64, max float64) (int) {
 	if value > max {
-		log.Infof("%s value [%s] higher than max [%s]", label, value, max)
+		log.Infof("%s value [%f] higher than max [%f]", label, value, max)
 		return 1
 	} else if value < min {
-		log.Infof("%s value [%s] lower than min [%s]", label, value, min)
+		log.Infof("%s value [%f] lower than min [%f]", label, value, min)
 		return -1
 	} else {
-		log.Infof("%s value [%s] between min [%s] and max [%s]", label, value, min)
+		log.Infof("%s value [%f] between min [%f] and max [%f]", label, value, min)
 		return 0
 	}
 }
