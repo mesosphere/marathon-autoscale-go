@@ -57,7 +57,7 @@ func RepoRemoveApp(appID string) error {
 
 //RepoRemoveAllApps cycles through the apps array and removes them all
 func RepoRemoveAllApps() error {
-	for _, scaler := range Scalers {
+	for _, scaler := range scalers {
 		if err := RepoRemoveApp(scaler.AppID); err != nil {
 			return err
 		}

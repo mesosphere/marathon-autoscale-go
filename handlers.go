@@ -104,7 +104,7 @@ func GetApp(w http.ResponseWriter, r *http.Request) {
 //IndexApps displays all monitored apps
 func IndexApps(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if err := json.NewEncoder(w).Encode(apps); err != nil {
+	if err := json.NewEncoder(w).Encode(scalers); err != nil {
 		log.Panicln(err)
 	}
 }

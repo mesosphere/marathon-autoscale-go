@@ -49,7 +49,7 @@ func generateSignal(cpu, mem float64, scaler *Scaler) ScaleSignal {
 
 //AutoScale track and scale apps
 func (scaler *Scaler) AutoScale(cpu, mem float64, st *scalerState, mApp MarathonApp) {
-	sig := generateSignal(cpu, mem, r)
+	sig := generateSignal(cpu, mem, scaler)
 	if !sig.Scale.down && !sig.Scale.up {
 		st.coolDown = 0
 		st.warmUp = 0

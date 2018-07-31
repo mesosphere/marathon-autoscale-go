@@ -42,7 +42,7 @@ func (scaler *Scaler) doMonitor() {
 	as := scalerState{0, 0}
 	var cpu, mem float64
 	for range tickers[scaler.AppID].C {
-		if !client.AppExists(r) {
+		if !client.AppExists(scaler) {
 			log.Warningf("%s not found in /service/marathon/v2/app", scaler.AppID)
 			continue
 		}

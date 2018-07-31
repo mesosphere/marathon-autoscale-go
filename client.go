@@ -174,11 +174,11 @@ func (c *Client) do(req *http.Request) ([]byte, error) {
 		if 401 == resp.StatusCode {
 			log.Infoln("Authentication expired. Re-authorizing account")
 			// Stop all monitors, re-authenticate, start all monitors
-			for _, a := range apps {
+			for _, a := range scalers {
 				a.StopMonitor()
 			}
 			c.auth()
-			for _, a := range apps {
+			for _, a := range scalers {
 				a.StartMonitor()
 			}
 		} else {
