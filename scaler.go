@@ -1,9 +1,5 @@
 package main
 
-// Scalers - all monitored apps
-// TODO GET RID OF THIS
-type Scalers []Scaler
-
 import (
 	"time"
 
@@ -41,6 +37,10 @@ type scalerState struct {
 	warmUp   int
 	coolDown int
 }
+
+// Scalers - all monitored apps
+// TODO GET RID OF THIS - should be attached to Repo (or ScalerManager, as it will be called)
+type Scalers []Scaler
 
 //StartMonitor starts a ticker goroutine
 func (scaler *Scaler) StartMonitor() {
