@@ -14,16 +14,16 @@ func init() {
 	tickers = make(map[string]*time.Ticker)
 }
 
-//RepoAddApp adds a Scaler to the repo
-func RepoAddApp(scaler Scaler) {
-	if !RepoAppInApps(scaler.AppID) {
+//ManagerAddScaler adds a Scaler to the repo
+func ManagerAddScaler(scaler Scaler) {
+	if !ManagerScalerInScalers(scaler.AppID) {
 		scalers = append(scalers, scaler)
 		scaler.StartMonitor()
 	}
 }
 
-//RepoAppInApps finds if an app is present in the apps list
-func RepoAppInApps(appID string) bool {
+//ManagerScalerInScalers finds if an app is present in the apps list
+func ManagerScalerInScalers(appID string) bool {
 	for _, scaler := range scalers {
 		if scaler.AppID == appID {
 			return true
@@ -32,8 +32,8 @@ func RepoAppInApps(appID string) bool {
 	return false
 }
 
-//RepoFindApp returns an Scaler object based on app ID
-func RepoFindApp(appID string) Scaler {
+//ManagerFindScaler returns an Scaler object based on app ID
+func ManagerFindScaler(appID string) Scaler {
 	for _, scaler := range scalers {
 		if scaler.AppID == appID {
 			return scaler
@@ -42,8 +42,8 @@ func RepoFindApp(appID string) Scaler {
 	return Scaler{}
 }
 
-//RepoRemoveApp re-slices the apps list to remove an app by its ID
-func RepoRemoveApp(appID string) error {
+//ManagerRemoveScaler re-slices the apps list to remove an app by its ID
+func ManagerRemoveScaler(appID string) error {
 	for i, scaler := range scalers {
 		if scaler.AppID == appID {
 			scalers = append(scalers[:i], scalers[i+1:]...)
@@ -55,10 +55,10 @@ func RepoRemoveApp(appID string) error {
 	return fmt.Errorf("could not find Scaler with id of %s to delete", appID)
 }
 
-//RepoRemoveAllApps cycles through the apps array and removes them all
-func RepoRemoveAllApps() error {
+//ManagerRemoveAllScalers cycles through the apps array and removes them all
+func ManagerRemoveAllScalers() error {
 	for _, scaler := range scalers {
-		if err := RepoRemoveApp(scaler.AppID); err != nil {
+		if err := ManagerRemoveScaler(scaler.AppID); err != nil {
 			return err
 		}
 	}

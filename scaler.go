@@ -39,7 +39,7 @@ type scalerState struct {
 }
 
 // Scalers - all monitored apps
-// TODO GET RID OF THIS - should be attached to Repo (or ScalerManager, as it will be called)
+// TODO GET RID OF THIS - should be attached to Repo (or Manager, as it will be called)
 type Scalers []Scaler
 
 //StartMonitor starts a ticker goroutine

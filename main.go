@@ -26,7 +26,7 @@ func main() {
 	go func() {
 		for _ = range signalChan {
 			log.Fatalln("Received an interrupt, stopping tickers")
-			RepoRemoveAllApps()
+			ManagerRemoveAllScalers()
 			cleanupDone <- true
 		}
 	}()

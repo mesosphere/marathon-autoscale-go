@@ -46,7 +46,7 @@ func RemoveScaler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	if err := RepoRemoveApp(appID.AppID); err != nil {
+	if err := ManagerRemoveScaler(appID.AppID); err != nil {
 		w.WriteHeader(400)
 		log.Panicln(err)
 	}
@@ -70,7 +70,7 @@ func AddScaler(w http.ResponseWriter, r *http.Request) {
 			log.Panicln(err)
 		}
 	}
-	RepoAddApp(scaler)
+	ManagerAddScaler(scaler)
 
 	w.WriteHeader(200)
 	JSONResponse(w, "OK")
@@ -94,9 +94,9 @@ func GetScaler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	app := RepoFindApp(appID.AppID)
+	scaler := ManagerFindScaler(appID.AppID)
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	if err := json.NewEncoder(w).Encode(app); err != nil {
+	if err := json.NewEncoder(w).Encode(scaler); err != nil {
 		log.Panicln(err)
 	}
 }
