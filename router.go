@@ -15,32 +15,32 @@ type Route struct {
 }
 
 // TODO remove redundant /app(s) endpoints
-var routes = []Route {
-	Route {
+var routes = []Route{
+	Route{
 		"Index",
 		"GET",
 		"/",
 		Index,
 	},
-	Route {
+	Route{
 		"ListScalers",
 		"GET",
 		"/scalers",
 		ListScalers,
 	},
-	Route {
+	Route{
 		"GetScaler",
 		"GET",
 		"/scaler",
 		GetScaler,
 	},
-	Route {
+	Route{
 		"AddScaler",
 		"POST",
 		"/scalers",
 		AddScaler,
 	},
-	Route {
+	Route{
 		"RemoveScaler",
 		"DELETE",
 		"/scalers",

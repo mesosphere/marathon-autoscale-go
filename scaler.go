@@ -102,7 +102,6 @@ func (scaler *Scaler) getCPUMem(marathonApp MarathonApp) (float64, float64) {
 	return cpu, mem
 }
 
-
 //generateSignal given cpu and mem values, return a scale proposal
 func generateSignal(cpu, mem float64, scaler *Scaler) ScaleSignal {
 	result := ScaleSignal{}
