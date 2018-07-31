@@ -102,78 +102,83 @@ func (scaler *Scaler) getCPUMem(marathonApp MarathonApp) (float64, float64) {
 	return cpu, mem
 }
 
-//generateSignal given cpu and mem values, return a scale proposal
-func generateSignal(cpu, mem float64, scaler *Scaler) ScaleSignal {
-	result := ScaleSignal{}
-	cpuDown := (cpu <= scaler.MinCPU)
-	cpuUp := (cpu > scaler.MaxCPU)
-	memDown := (mem <= scaler.MinMem)
-	memUp := (mem > scaler.MinMem)
+// MVP: need to expand so we can log more information
+func (scaler *Scaler) autoscaleCpuMem(cpu, mem float64) (int) {
+	cpuDirection := getDirection("cpu", cpu, scaler.MinCPU, scaler.MaxCPU)
+	memDirection := getDirection("mem", mem, scaler.MinMem, scaler.MaxMem)
+	direction := 0
 	switch method := scaler.Method; method {
 	case "cpu":
-		result.Scale.up = cpuUp
-		result.Scale.down = cpuDown
+		direction = cpuDirection
 	case "mem":
-		result.Scale.up = memUp
-		result.Scale.down = memDown
+		direction = memDirection
 	case "and":
-		result.Scale.up = cpuUp && memUp
-		result.Scale.down = cpuDown && memDown
+		if cpuDirection == memDirection {
+			direction = cpuDirection
+		}
 	case "or":
-		result.Scale.up = cpuUp || memUp
-		result.Scale.down = cpuDown || memDown
-	default:
-		log.Errorf("method should be cpu|mem|and|or: %s", method)
-		log.Panicln("Invalid scaling parameter method.")
-	}
-	if result.Scale.up && result.Scale.down {
-		log.Warnf("Scale up and scale down signal generated, defaulting to no operation. %+v", result)
-		result.Scale.up = false
-		result.Scale.down = false
+		if (cpuDirection + memDirection) > 0 {
+			direction = 1
+		} else if (cpuDirection + memDirection) < 0 {
+			direction = -1
+		}
 	}
 
-	return result
+	return direction
+}
+
+// TODO actually output value of direction
+func getDirection(label string, value float64, min float64, max float64) (int) {
+	if value > max {
+		log.Infof("%s value [%s] higher than max [%s]", label, value, max)
+		return 1
+	} else if value < min {
+		log.Infof("%s value [%s] lower than min [%s]", label, value, min)
+		return -1
+	} else {
+		log.Infof("%s value [%s] between min [%s] and max [%s]", label, value, min)
+		return 0
+	}
 }
 
 //AutoScale track and scale apps
 func (scaler *Scaler) AutoScale(cpu, mem float64, st *scalerState, mApp MarathonApp) {
-	sig := generateSignal(cpu, mem, scaler)
-	if !sig.Scale.down && !sig.Scale.up {
+	direction := scaler.autoscaleCpuMem(cpu, mem)
+	// sig := generateSignal(cpu, mem, scaler)
+	if direction == 1 {
+		if mApp.App.Instances < scaler.MaxInstances {
+			st.warmUp++
+			if st.warmUp >= scaler.WarmUp {
+				log.Infof("%s scale up triggered with %d of %d signals of %s",
+					scaler.AppID, st.warmUp, scaler.WarmUp, scaler.Method)
+				scaler.doScale(mApp, scaler.ScaleFactor)
+				st.warmUp = 0
+			} else {
+				log.Infof("%s warming up %s(%d of %d)",
+					scaler.AppID, scaler.Method, st.warmUp, scaler.WarmUp)
+			}
+		} else {
+			log.Infof("%s reached max instances %d", scaler.AppID, scaler.MaxInstances)
+		}
+	} else if direction == -1 {
+		if mApp.App.Instances > scaler.MinInstances {
+			st.coolDown++
+			if st.coolDown >= scaler.CoolDown {
+				log.Infof("%s scale down triggered with %d of %d signals of %s",
+					scaler.AppID, st.coolDown, scaler.CoolDown, scaler.Method)
+				scaler.doScale(mApp, -scaler.ScaleFactor)
+				st.coolDown = 0
+			} else {
+				log.Infof("%s cooling down %s(%d of %d)",
+					scaler.AppID, scaler.Method, st.coolDown, scaler.CoolDown)
+			}
+		} else {
+			log.Infof("%s reached min instances %d", scaler.AppID, scaler.MinInstances)
+		}
+
+	} else {
 		st.coolDown = 0
 		st.warmUp = 0
-	} else {
-		if sig.Scale.up {
-			if mApp.App.Instances < scaler.MaxInstances {
-				st.warmUp++
-				if st.warmUp >= scaler.WarmUp {
-					log.Infof("%s scale up triggered with %d of %d signals of %s",
-						scaler.AppID, st.warmUp, scaler.WarmUp, scaler.Method)
-					scaler.doScale(mApp, scaler.ScaleFactor)
-					st.warmUp = 0
-				} else {
-					log.Infof("%s warming up %s(%d of %d)",
-						scaler.AppID, scaler.Method, st.warmUp, scaler.WarmUp)
-				}
-			} else {
-				log.Infof("%s reached max instances %d", scaler.AppID, scaler.MaxInstances)
-			}
-		}
-		if sig.Scale.down {
-			if mApp.App.Instances > scaler.MinInstances {
-				st.coolDown++
-				if st.coolDown >= scaler.CoolDown {
-					log.Infof("%s scale down triggered with %d of %d signals of %s",
-						scaler.AppID, st.coolDown, scaler.CoolDown, scaler.Method)
-					scaler.doScale(mApp, -scaler.ScaleFactor)
-					st.coolDown = 0
-				} else {
-					log.Infof("%s cooling down %s(%d of %d)",
-						scaler.AppID, scaler.Method, st.coolDown, scaler.CoolDown)
-				}
-			} else {
-				log.Infof("%s reached min instances %d", scaler.AppID, scaler.MinInstances)
-			}
-		}
 	}
 
 }
