@@ -14,7 +14,7 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
-var routes = []Routes {
+var routes = []Route {
 	Route {
 		"Index",
 		"GET",
