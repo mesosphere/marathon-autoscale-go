@@ -17,7 +17,7 @@ func init() {
 //RepoAddApp adds a Scaler to the repo
 func RepoAddApp(scaler Scaler) {
 	if !RepoAppInApps(scaler.AppID) {
-		apps = append(scalers, scaler)
+		scalers = append(scalers, scaler)
 		scaler.StartMonitor()
 	}
 }
