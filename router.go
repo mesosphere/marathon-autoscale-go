@@ -14,6 +14,7 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
+// TODO remove redundant /app(s) endpoints
 var routes = []Route {
 	Route {
 		"Index",
@@ -22,28 +23,52 @@ var routes = []Route {
 		Index,
 	},
 	Route {
-		"IndexApps",
+		"ListScalers",
 		"GET",
 		"/apps",
-		IndexApps,
+		ListScalers,
 	},
 	Route {
-		"GetApp",
+		"GetScaler",
 		"GET",
 		"/app",
-		GetApp,
+		GetScaler,
 	},
 	Route {
-		"AddApp",
+		"AddScaler",
 		"POST",
 		"/apps",
-		AddApp,
+		AddScaler,
 	},
 	Route {
-		"RemoveApp",
+		"RemoveScaler",
 		"DELETE",
 		"/apps",
-		RemoveApp,
+		RemoveScaler,
+	},
+	Route {
+		"ListScalers",
+		"GET",
+		"/scalers",
+		ListScalers,
+	},
+	Route {
+		"GetScaler",
+		"GET",
+		"/scaler",
+		GetScaler,
+	},
+	Route {
+		"AddScaler",
+		"POST",
+		"/scalers",
+		AddScaler,
+	},
+	Route {
+		"RemoveScaler",
+		"DELETE",
+		"/scalers",
+		RemoveScaler,
 	},
 }
 

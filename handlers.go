@@ -28,7 +28,7 @@ func JSONResponse(w http.ResponseWriter, message string) {
 }
 
 //RemoveApp removes app by its ID from the pool of apps being monitored
-func RemoveApp(w http.ResponseWriter, r *http.Request) {
+func RemoveScaler(w http.ResponseWriter, r *http.Request) {
 	var appID AppID
 
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
@@ -54,7 +54,7 @@ func RemoveApp(w http.ResponseWriter, r *http.Request) {
 }
 
 //AddApp adds a scaler to the pool of monitored apps
-func AddApp(w http.ResponseWriter, r *http.Request) {
+func AddScaler(w http.ResponseWriter, r *http.Request) {
 	var scaler Scaler
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -77,7 +77,7 @@ func AddApp(w http.ResponseWriter, r *http.Request) {
 }
 
 //GetApp finds and displays a monitored app by its ID
-func GetApp(w http.ResponseWriter, r *http.Request) {
+func GetScaler(w http.ResponseWriter, r *http.Request) {
 	var appID AppID
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
@@ -102,7 +102,7 @@ func GetApp(w http.ResponseWriter, r *http.Request) {
 }
 
 //IndexApps displays all monitored apps
-func IndexApps(w http.ResponseWriter, r *http.Request) {
+func ListScalers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 	if err := json.NewEncoder(w).Encode(scalers); err != nil {
 		log.Panicln(err)
