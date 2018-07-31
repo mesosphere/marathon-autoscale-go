@@ -6,8 +6,8 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-//App struct describing autoscaling app
-type App struct {
+//Scaler struct describing autoscaling policy
+type Scaler struct {
 	AppID        string  `json:"app_id"`
 	MaxCPU       float64 `json:"max_cpu"`
 	MinCPU       float64 `json:"min_cpu"`
@@ -23,48 +23,49 @@ type App struct {
 }
 
 //Apps - all monitored apps
-type Apps []App
+// TODO GET RID OF THIS
+type Scalers []Scaler
 
-type appState struct {
+type scalerState struct {
 	warmUp   int
 	coolDown int
 }
 
 //StartMonitor starts a ticker goroutine
-func (a *App) StartMonitor() {
-	tickers[a.AppID] = time.NewTicker(time.Second * time.Duration(a.Interval))
-	go a.doMonitor()
+func (r *Scaler) StartMonitor() {
+	tickers[r.AppID] = time.NewTicker(time.Second * time.Duration(r.Interval))
+	go r.doMonitor()
 }
 
 //doMonitor will be storing the intermediate state of the app metrics
-func (a *App) doMonitor() {
-	as := appState{0, 0}
+func (r *Scaler) doMonitor() {
+	as := scalerState{0, 0}
 	var cpu, mem float64
-	for range tickers[a.AppID].C {
+	for range tickers[r.AppID].C {
 		if !client.AppExists(a) {
-			log.Warningf("%s not found in /service/marathon/v2/app", a.AppID)
+			log.Warningf("%s not found in /service/marathon/v2/app", r.AppID)
 			continue
 		}
-		marathonApp := client.GetMarathonApp(a.AppID)
+		marathonApp := client.GetMarathonApp(r.AppID)
 		if marathonApp.App.Instances == 0 {
 			log.Warningf("%s suspended, skipping monitoring cycle", marathonApp.App.ID)
 			continue
 		}
-		if !a.EnsureMinMaxInstances(marathonApp) {
+		if !r.EnsureMinMaxInstances(marathonApp) {
 			continue
 		}
-		cpu, mem = a.getCPUMem(marathonApp)
-		log.Infof("app:%s cpu:%f, mem:%f", a.AppID, cpu, mem)
-		a.AutoScale(cpu, mem, &as, marathonApp)
+		cpu, mem = r.getCPUMem(marathonApp)
+		log.Infof("app:%s cpu:%f, mem:%f", r.AppID, cpu, mem)
+		r.AutoScale(cpu, mem, &as, marathonApp)
 	}
 }
 
 //StopMonitor stops the ticker associated with the given app
-func (a *App) StopMonitor() {
-	tickers[a.AppID].Stop()
+func (r *Scaler) StopMonitor() {
+	tickers[r.AppID].Stop()
 }
 
-func (a *App) getCPUMem(marathonApp MarathonApp) (float64, float64) {
+func (r *Scaler) getCPUMem(marathonApp MarathonApp) (float64, float64) {
 	var (
 		stats1, stats2               TaskStats
 		cpu, cpu1, cpu2, cpuD, timeD float64

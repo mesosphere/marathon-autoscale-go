@@ -53,9 +53,9 @@ func RemoveApp(w http.ResponseWriter, r *http.Request) {
 	JSONResponse(w, "OK")
 }
 
-//AddApp adds an app to the pool of monitored apps
+//AddApp adds a scaler to the pool of monitored apps
 func AddApp(w http.ResponseWriter, r *http.Request) {
-	var app App
+	var scaler Scaler
 	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 	if err != nil {
 		log.Panicln(err)
@@ -63,14 +63,14 @@ func AddApp(w http.ResponseWriter, r *http.Request) {
 	if err := r.Body.Close(); err != nil {
 		log.Panicln(err)
 	}
-	if err := json.Unmarshal(body, &app); err != nil {
+	if err := json.Unmarshal(body, &scaler); err != nil {
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(422) // unprocessable entity
 		if err := json.NewEncoder(w).Encode(err); err != nil {
 			log.Panicln(err)
 		}
 	}
-	RepoAddApp(app)
+	RepoAddApp(scaler)
 
 	w.WriteHeader(200)
 	JSONResponse(w, "OK")
@@ -111,5 +111,5 @@ func IndexApps(w http.ResponseWriter, r *http.Request) {
 
 //Index for slash, returns version
 func Index(w http.ResponseWriter, r *http.Request) {
-	JSONResponse(w, "Autoscaler, v0.0.1")
+	JSONResponse(w, "Autoscaler, v0.0.2")
 }

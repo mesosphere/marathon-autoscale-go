@@ -6,58 +6,59 @@ import (
 	"time"
 )
 
-var apps Apps
+// TODO make this part of repo
+var scalers Scalers
 var tickers map[string]*time.Ticker
 
 func init() {
 	tickers = make(map[string]*time.Ticker)
 }
 
-//RepoAddApp adds an App to the repo
-func RepoAddApp(a App) {
-	if !RepoAppInApps(a.AppID) {
-		apps = append(apps, a)
-		a.StartMonitor()
+//RepoAddApp adds a Scaler to the repo
+func RepoAddApp(r Scaler) {
+	if !RepoAppInApps(r.AppID) {
+		apps = append(scalers, r)
+		r.StartMonitor()
 	}
 }
 
 //RepoAppInApps finds if an app is present in the apps list
 func RepoAppInApps(appID string) bool {
-	for _, a := range apps {
-		if a.AppID == appID {
+	for _, r := range scalers {
+		if r.AppID == appID {
 			return true
 		}
 	}
 	return false
 }
 
-//RepoFindApp returns an App object based on app ID
-func RepoFindApp(appID string) App {
-	for _, a := range apps {
-		if a.AppID == appID {
-			return a
+//RepoFindApp returns an Scaler object based on app ID
+func RepoFindApp(appID string) Scaler {
+	for _, r := range scalers {
+		if r.AppID == appID {
+			return r
 		}
 	}
-	return App{}
+	return Scaler{}
 }
 
 //RepoRemoveApp re-slices the apps list to remove an app by its ID
 func RepoRemoveApp(appID string) error {
-	for i, a := range apps {
-		if a.AppID == appID {
-			apps = append(apps[:i], apps[i+1:]...)
+	for i, r := range scalers {
+		if r.AppID == appID {
+			scalers = append(scalers[:i], scalers[i+1:]...)
 			//Stopping the ticker
 			tickers[appID].Stop()
 			return nil
 		}
 	}
-	return fmt.Errorf("could not find App with id of %s to delete", appID)
+	return fmt.Errorf("could not find Scaler with id of %s to delete", appID)
 }
 
 //RepoRemoveAllApps cycles through the apps array and removes them all
 func RepoRemoveAllApps() error {
-	for _, a := range apps {
-		if err := RepoRemoveApp(a.AppID); err != nil {
+	for _, r := range Scalers {
+		if err := RepoRemoveApp(r.AppID); err != nil {
 			return err
 		}
 	}
