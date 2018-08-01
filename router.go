@@ -14,7 +14,6 @@ type Route struct {
 	HandlerFunc http.HandlerFunc
 }
 
-// TODO remove redundant /app(s) endpoints
 var routes = []Route{
 	Route{
 		"Index",

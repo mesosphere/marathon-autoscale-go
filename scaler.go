@@ -6,17 +6,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-//ScaleSignal describes a scale proposal
-type ScaleSignal struct {
-	Scale scaleDirection
-}
-
-// This needs to be turned into an int: -1, 0, 1
-type scaleDirection struct {
-	up   bool
-	down bool
-}
-
 //Scaler struct describing autoscaling policy
 type Scaler struct {
 	AppID        string  `json:"app_id"`
